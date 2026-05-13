@@ -13,6 +13,7 @@ const pool =
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
+    port: 3308,
     connectionLimit: 10,
     timezone: "+00:00",
   });
