@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { inventory_id, count_change, description, type } = body;
+  const { inventory_id, count_change, description, type, created_at } = body;
 
   if (!inventory_id || !count_change || count_change <= 0) {
     return NextResponse.json(
@@ -65,8 +65,13 @@ export async function POST(request: NextRequest) {
       type === "export" ? -Math.abs(count_change) : Math.abs(count_change);
 
     await connection.query(
-      "INSERT INTO inventory_activity (inventory_id, count_change, description) VALUES (?, ?, ?)",
-      [inventory_id, actualChange, description ?? null],
+      "INSERT INTO inventory_activity (inventory_id, count_change, description, created_at) VALUES (?, ?, ?, ?)",
+      [
+        inventory_id,
+        actualChange,
+        description ?? null,
+        created_at ?? new Date(),
+      ],
     );
 
     await connection.query(

@@ -7,10 +7,12 @@ interface Props {
   item: InventoryItem;
   count: string;
   description: string;
+  date: string;
   error: string;
   submitting: boolean;
   onCountChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
+  onDateChange: (v: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 }
@@ -20,10 +22,12 @@ export default function ActivityModal({
   item,
   count,
   description,
+  date,
   error,
   submitting,
   onCountChange,
   onDescriptionChange,
+  onDateChange,
   onClose,
   onSubmit,
 }: Props) {
@@ -40,6 +44,8 @@ export default function ActivityModal({
     // do not allow auto suggestion
   );
 
+  // Fix: only attach handleKeyDown to the inner modal, not the overlay,
+  // so keyboard events don't bubble up and fire onSubmit twice.
   return (
     <div
       className="fixed inset-0 bg-black/45 flex items-center justify-center z-[200] p-4"
@@ -47,11 +53,11 @@ export default function ActivityModal({
       aria-modal="true"
       aria-labelledby="modal-title"
       onClick={onClose}
-      onKeyDown={handleKeyDown}
     >
       <div
         className="bg-white rounded-xl shadow-xl w-full max-w-[440px] overflow-hidden animate-slide-up"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
       >
         {/* Header */}
         <div
@@ -102,7 +108,6 @@ export default function ActivityModal({
               placeholder="Nhập số lượng..."
               value={count}
               onChange={(e) => onCountChange(e.target.value)}
-              onKeyDown={handleKeyDown}
               className={inputCls}
               autoComplete="off"
               autoFocus
@@ -122,9 +127,24 @@ export default function ActivityModal({
               placeholder="Nhập ghi chú..."
               value={description}
               onChange={(e) => onDescriptionChange(e.target.value)}
-              onKeyDown={handleKeyDown}
               className={inputCls}
               autoComplete="off"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label
+              htmlFor="modal-date"
+              className="text-[13px] font-medium text-gray-600"
+            >
+              Ngày
+            </label>
+            <input
+              id="modal-date"
+              type="date"
+              value={date}
+              onChange={(e) => onDateChange(e.target.value)}
+              className={inputCls}
             />
           </div>
 

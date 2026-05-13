@@ -30,6 +30,7 @@ export default function InventoryPage() {
   });
   const [modalCount, setModalCount] = useState("");
   const [modalDescription, setModalDescription] = useState("");
+  const [modalDate, setModalDate] = useState("");
   const [modalError, setModalError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -103,6 +104,8 @@ export default function InventoryPage() {
     }
   };
 
+  const todayValue = () => new Date().toISOString().slice(0, 10);
+
   const openModal = (
     e: React.MouseEvent,
     type: "import" | "export",
@@ -112,6 +115,7 @@ export default function InventoryPage() {
     setModal({ open: true, type, item });
     setModalCount("");
     setModalDescription("");
+    setModalDate(todayValue());
     setModalError("");
   };
 
@@ -138,6 +142,7 @@ export default function InventoryPage() {
           count_change: count,
           description: modalDescription.trim() || undefined,
           type: modal.type,
+          created_at: modalDate || todayValue(),
         }),
       });
       const data = await res.json();
@@ -159,7 +164,15 @@ export default function InventoryPage() {
     }
   };
 
-  const groups = groupByCategory(items);
+  const [search, setSearch] = useState("");
+
+  const groups = groupByCategory(
+    search.trim()
+      ? items.filter((i) =>
+          i.name.toLowerCase().includes(search.trim().toLowerCase()),
+        )
+      : items,
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-sm text-gray-800">
@@ -205,6 +218,30 @@ export default function InventoryPage() {
           </div>
         )}
 
+        {/* Search bar */}
+        <div className="relative mb-4">
+          <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
+            🔍
+          </span>
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên sản phẩm..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg pl-9 pr-9 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all bg-white"
+            autoComplete="off"
+          />
+          {search && (
+            <button
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              onClick={() => setSearch("")}
+              aria-label="Xóa tìm kiếm"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         {loading ? (
           <div className="flex items-center gap-3 px-12 py-12 text-gray-400 text-[15px]">
             <div className="w-[22px] h-[22px] border-[3px] border-gray-200 border-t-blue-500 rounded-full animate-spin" />
@@ -241,10 +278,12 @@ export default function InventoryPage() {
           item={modal.item}
           count={modalCount}
           description={modalDescription}
+          date={modalDate}
           error={modalError}
           submitting={submitting}
           onCountChange={setModalCount}
           onDescriptionChange={setModalDescription}
+          onDateChange={setModalDate}
           onClose={closeModal}
           onSubmit={handleSubmit}
         />

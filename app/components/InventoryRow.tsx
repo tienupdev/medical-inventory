@@ -70,7 +70,7 @@ export default function InventoryRow({
           className={clsx(
             tdCls,
             "text-right tabular-nums",
-            item.opening_stock === 0 && "text-gray-300",
+            item.opening_stock === 0 && "text-gray-200",
           )}
         >
           {fmt(item.opening_stock)}
@@ -81,7 +81,7 @@ export default function InventoryRow({
           className={clsx(
             tdCls,
             "text-right tabular-nums font-medium",
-            item.imported === 0 ? "text-gray-300" : "text-green-700",
+            item.imported === 0 ? "text-gray-200" : "text-green-700",
           )}
         >
           {fmt(item.imported)}
@@ -92,7 +92,7 @@ export default function InventoryRow({
           className={clsx(
             tdCls,
             "text-right tabular-nums font-medium",
-            item.exported === 0 ? "text-gray-300" : "text-orange-600",
+            item.exported === 0 ? "text-gray-200" : "text-orange-600",
           )}
         >
           {fmt(item.exported)}
@@ -116,22 +116,18 @@ export default function InventoryRow({
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-center gap-1.5 w-[110px]">
-            {isCurrentMonth && (
-              <>
-                <button
-                  className="inline-flex items-center px-3 py-1.5 text-[13px] font-semibold rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
-                  onClick={(e) => onOpenModal(e, "import", item)}
-                >
-                  Nhập
-                </button>
-                <button
-                  className="inline-flex items-center px-3 py-1.5 text-[13px] font-semibold rounded-md bg-orange-100 text-orange-600 hover:bg-orange-200 disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
-                  onClick={(e) => onOpenModal(e, "export", item)}
-                >
-                  Xuất
-                </button>
-              </>
-            )}
+            <button
+              className="inline-flex items-center px-3 py-1.5 text-[13px] font-semibold rounded-md bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+              onClick={(e) => onOpenModal(e, "import", item)}
+            >
+              Nhập
+            </button>
+            <button
+              className="inline-flex items-center px-3 py-1.5 text-[13px] font-semibold rounded-md bg-orange-100 text-orange-600 hover:bg-orange-200 disabled:opacity-55 disabled:cursor-not-allowed transition-colors"
+              onClick={(e) => onOpenModal(e, "export", item)}
+            >
+              Xuất
+            </button>
           </div>
         </td>
       </tr>

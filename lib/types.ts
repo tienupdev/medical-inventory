@@ -21,6 +21,7 @@ export interface ActivityPayload {
   count_change: number;
   description?: string;
   type: "import" | "export";
+  created_at?: string;
 }
 export interface ActivityEntry {
   id: number;
