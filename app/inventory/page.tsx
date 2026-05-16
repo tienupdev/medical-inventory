@@ -48,6 +48,10 @@ export default function InventoryPage() {
   const month = parseInt(ymMonth, 10);
   const year = parseInt(ymYear, 10);
 
+  useEffect(() => {
+    setModalDate(todayValue());
+  }, []);
+
   const fetchInventory = useCallback(async () => {
     setLoading(true);
     setFetchError("");
