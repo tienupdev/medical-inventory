@@ -115,7 +115,6 @@ export default function InventoryPage() {
     setModal({ open: true, type, item });
     setModalCount("");
     setModalDescription("");
-    setModalDate(todayValue());
     setModalError("");
   };
 
