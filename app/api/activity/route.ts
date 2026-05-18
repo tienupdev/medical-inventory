@@ -49,16 +49,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const currentCount = Number(rows[0].count);
+    if (type === "export") {
+      // Stock at the chosen date = current total minus all activity that happened AFTER that date
+      const entryDate = created_at ? new Date(created_at) : new Date();
+      // End of the chosen day (23:59:59.999)
+      const endOfDay = new Date(entryDate);
+      endOfDay.setHours(23, 59, 59, 999);
 
-    if (type === "export" && count_change > currentCount) {
-      await connection.rollback();
-      return NextResponse.json(
-        {
-          error: `Số lượng xuất (${count_change}) vượt quá tồn kho hiện tại (${currentCount})`,
-        },
-        { status: 400 },
+      const [futureRows] = await connection.query<RowDataPacket[]>(
+        "SELECT COALESCE(SUM(count_change), 0) AS future_delta FROM inventory_activity WHERE inventory_id = ? AND created_at > ?",
+        [inventory_id, endOfDay],
       );
+      const currentTotal = Number(rows[0].count);
+      const futureDelta = Number(futureRows[0].future_delta);
+      const stockAtDate = currentTotal - futureDelta;
+
+      if (count_change > stockAtDate) {
+        await connection.rollback();
+        return NextResponse.json(
+          {
+            error: `Số lượng xuất (${count_change}) vượt quá tồn kho tại ngày đã chọn (${stockAtDate})`,
+          },
+          { status: 400 },
+        );
+      }
     }
 
     const actualChange =

@@ -36,7 +36,7 @@ export default function InventoryTable({
   return (
     <div className="bg-white rounded-lg shadow overflow-x-auto max-w-[1024px]">
       <table className="w-full border-collapse min-w-[700px]">
-        <thead>
+        <thead className="sticky top-0 z-10">
           <tr className="bg-gray-50 border-b-2 border-gray-200">
             <th className="w-8" />
             <th className="px-3.5 min-w-[450px] py-3 text-left text-xs font-semibold uppercase text-gray-500 whitespace-nowrap">

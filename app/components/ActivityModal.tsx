@@ -1,5 +1,5 @@
 import type { InventoryItem } from "@/lib/types";
-import { fmt } from "@/lib/utils";
+import { fmt, fmtDate } from "@/lib/utils";
 import clsx from "clsx";
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
   count: string;
   description: string;
   date: string;
+  stockAtDate: number | null;
   error: string;
   submitting: boolean;
   onCountChange: (v: string) => void;
@@ -23,6 +24,7 @@ export default function ActivityModal({
   count,
   description,
   date,
+  stockAtDate,
   error,
   submitting,
   onCountChange,
@@ -83,10 +85,17 @@ export default function ActivityModal({
 
           {!isImport && (
             <p className="text-[13px] text-gray-600">
-              Tồn hiện tại:{" "}
-              <strong className={item.count < 3 ? "text-red-600" : ""}>
-                {fmt(item.count)} {item.unit}
-              </strong>
+              Tồn tính đến ngày {fmtDate(date)} là:{" "}
+              {stockAtDate === null ? (
+                <span className="inline-flex items-center gap-1 text-gray-400">
+                  <span className="w-3 h-3 border border-gray-300 border-t-blue-400 rounded-full animate-spin inline-block" />
+                  Đang tải...
+                </span>
+              ) : (
+                <strong className={stockAtDate < 3 ? "text-red-600" : ""}>
+                  {fmt(stockAtDate)} {item.unit}
+                </strong>
+              )}
             </p>
           )}
 

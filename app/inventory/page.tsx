@@ -32,6 +32,7 @@ export default function InventoryPage() {
   const [modalDescription, setModalDescription] = useState("");
   const [modalDate, setModalDate] = useState("");
   const [modalError, setModalError] = useState("");
+  const [stockAtDate, setStockAtDate] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
@@ -107,6 +108,28 @@ export default function InventoryPage() {
       });
     }
   };
+
+  // Fetch stock-at-date whenever the export modal is open and date changes
+  useEffect(() => {
+    if (!modal.open || modal.type !== "export" || !modal.item || !modalDate) {
+      setStockAtDate(null);
+      return;
+    }
+    let cancelled = false;
+    fetch(
+      `/api/inventory/stock-at-date?inventory_id=${modal.item.id}&date=${modalDate}`,
+    )
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled) setStockAtDate(d.stock ?? null);
+      })
+      .catch(() => {
+        if (!cancelled) setStockAtDate(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [modal.open, modal.type, modal.item, modalDate]);
 
   const todayValue = () => new Date().toISOString().slice(0, 10);
 
@@ -185,6 +208,29 @@ export default function InventoryPage() {
           <h1 className="text-xl font-bold text-blue-600 whitespace-nowrap">
             Quản lý xuất nhập kho
           </h1>
+          {/* Search bar */}
+          <div className="relative flex-1">
+            <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg pl-9 pr-9 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all bg-white"
+              autoComplete="off"
+            />
+            {search && (
+              <button
+                className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+                onClick={() => setSearch("")}
+                aria-label="Xóa tìm kiếm"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <button
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
             onClick={() => setShowAddProduct(true)}
@@ -221,29 +267,7 @@ export default function InventoryPage() {
           </div>
         )}
 
-        {/* Search bar */}
-        <div className="relative mb-4">
-          <span className="absolute inset-y-0 left-3 flex items-center text-gray-400 pointer-events-none">
-            🔍
-          </span>
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên sản phẩm..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg pl-9 pr-9 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all bg-white"
-            autoComplete="off"
-          />
-          {search && (
-            <button
-              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
-              onClick={() => setSearch("")}
-              aria-label="Xóa tìm kiếm"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+        {/* Search bar removed — moved to header */}
 
         {loading ? (
           <div className="flex items-center gap-3 px-12 py-12 text-gray-400 text-[15px]">
@@ -282,6 +306,7 @@ export default function InventoryPage() {
           count={modalCount}
           description={modalDescription}
           date={modalDate}
+          stockAtDate={stockAtDate}
           error={modalError}
           submitting={submitting}
           onCountChange={setModalCount}

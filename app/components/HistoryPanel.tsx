@@ -58,7 +58,7 @@ export default function HistoryPanel({ isLoading, history, colSpan }: Props) {
                           className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold ${
                             isImport
                               ? "bg-green-100 text-green-700"
-                              : "bg-orange-100 text-orange-600"
+                              : "bg-orange-100 text-red-600"
                           }`}
                         >
                           {isImport ? "Nhập" : "Xuất"}
@@ -66,7 +66,7 @@ export default function HistoryPanel({ isLoading, history, colSpan }: Props) {
                       </td>
                       <td
                         className={`px-2.5 py-[7px] text-right tabular-nums font-medium ${
-                          isImport ? "text-green-700" : "text-orange-600"
+                          isImport ? "text-green-700" : "text-red-600"
                         }`}
                       >
                         {isImport ? "+" : "−"}

@@ -80,8 +80,8 @@ export default function InventoryRow({
         <td
           className={clsx(
             tdCls,
-            "text-right tabular-nums font-medium",
-            item.imported === 0 ? "text-gray-200" : "text-green-700",
+            "text-right tabular-nums font-semibold",
+            item.imported === 0 ? "text-transparent" : "text-green-700",
           )}
         >
           {fmt(item.imported)}
@@ -91,8 +91,8 @@ export default function InventoryRow({
         <td
           className={clsx(
             tdCls,
-            "text-right tabular-nums font-medium",
-            item.exported === 0 ? "text-gray-200" : "text-orange-600",
+            "text-right tabular-nums font-semibold",
+            item.exported === 0 ? "text-transparent" : "text-red-600",
           )}
         >
           {fmt(item.exported)}
