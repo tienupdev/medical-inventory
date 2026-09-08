@@ -6,6 +6,8 @@ import { groupByCategory } from "@/lib/utils";
 import InventoryTable from "../components/InventoryTable";
 import ActivityModal from "../components/ActivityModal";
 import AddProductModal from "../components/AddProductModal";
+import { useAtom } from "jotai";
+import { historyCacheAtom, selectedMonthAtom } from "../store/history";
 
 interface ModalState {
   open: boolean;
@@ -17,7 +19,7 @@ export default function InventoryPage() {
   const now = new Date();
   const currentMonthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-  const [selectedMonth, setSelectedMonth] = useState(currentMonthValue);
+  const [selectedMonth, setSelectedMonth] = useAtom(selectedMonthAtom);
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [isCurrentMonth, setIsCurrentMonth] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -36,9 +38,7 @@ export default function InventoryPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
-  const [historyCache, setHistoryCache] = useState<
-    Map<number, ActivityEntry[]>
-  >(new Map());
+  const [historyCache, setHistoryCache] = useAtom(historyCacheAtom);
   const [historyLoading, setHistoryLoading] = useState<Set<number>>(new Set());
 
   const monthInputRef = useRef<HTMLInputElement>(null);

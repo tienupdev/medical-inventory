@@ -137,6 +137,7 @@ export default function InventoryRow({
           isLoading={isLoadingHist}
           history={history}
           colSpan={colSpan}
+          item={item}
         />
       )}
     </React.Fragment>
