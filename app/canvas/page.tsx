@@ -5,27 +5,25 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 // --- Constants ---
-const CIRCLE_SIZE = 1920; // px diameter of the outer (largest) circle
-const STROKE_WIDTH = 15; // white stroke width for every stroked circle
-const ANIMATION_FADE_MS = 500; // fade-in / fade-out duration per circle
-const ANIMATION_HOLD_MS = 100; // hold at full opacity before fading out
-const DELAY = 50; // ms stagger between consecutive circles (outer -> inner)
-const CAMERA_VIEWPOINT = 560; // camera Y position (height above the xz floor)
-const CAMERA_TARGET = 95; // camera Y position (height above the xz floor)
-const VIEWPOINT_DISTANCE_Z = -2080; // camera Z (negative so the plate is visible)
-const MAX_FPS = 60; // cap the render loop at 60 frames per second
-
-// --- "Smiley" concave bowl distortion (circle area only) ---
-const SMILEY_DEPTH = 90; // max downward dip at the plate center (world -Y)
-const PLANE_SEGMENTS = 64; // plate subdivisions so the concave bowl is smooth
-const RING_SIZE = STROKE_WIDTH * 3; // distance between consecutive stroked circles
-const MINIMUM_CIRCLE_SIZE = 100;
-const IS_ANIMATING = true; // if false, show all circles at full opacity (no fade)
-const IS_FROM_OUTER_TO_INNER = false; // if false, animate from inner to outer
-// Animation plays only within this circle index range (0 = outermost).
-// ANIMATION_LOOP_TO = -1 means "up to the innermost circle".
-const ANIMATION_LOOP_FROM = 5;
-const ANIMATION_LOOP_TO = 14;
+import {
+  CIRCLE_SIZE,
+  STROKE_WIDTH,
+  ANIMATION_FADE_MS,
+  ANIMATION_HOLD_MS,
+  DELAY,
+  CAMERA_VIEWPOINT,
+  CAMERA_TARGET,
+  VIEWPOINT_DISTANCE_Z,
+  MAX_FPS,
+  SMILEY_DEPTH,
+  PLANE_SEGMENTS,
+  RING_SIZE,
+  MINIMUM_CIRCLE_SIZE,
+  IS_ANIMATING,
+  IS_FROM_OUTER_TO_INNER,
+  ANIMATION_LOOP_FROM,
+  ANIMATION_LOOP_TO,
+} from "./constants";
 
 type Circle = { diameter: number; filled: boolean };
 
@@ -138,8 +136,8 @@ export default function CanvasPage() {
         tctx.save();
         tctx.globalAlpha = alpha;
         tctx.lineWidth = STROKE_WIDTH;
-        tctx.strokeStyle = "#ffffff";
-        tctx.fillStyle = "#ffffff";
+        tctx.strokeStyle = i % 2 === 0 ? "#ffffff" : "#ffffff80";
+        tctx.fillStyle = i % 2 === 0 ? "#ffffff" : "#ffffff80";
         tctx.beginPath();
         tctx.arc(center, center, radius, 0, Math.PI * 2);
         if (c.filled) {
@@ -258,9 +256,10 @@ export default function CanvasPage() {
         className={clsx(
           "absolute inset-0 bg-contain bg-center bg-no-repeat",
           "w-[1920px] h-[1600px]",
-          "left-[2px] top-[164px]",
+          "left-[2px] top-[163px]",
+          "bg-black",
         )}
-        style={{ backgroundImage: "url('/canvas.jpg')" }}
+        // style={{ backgroundImage: "url('/canvas.jpg')" }}
       />
       {/* WebGL canvas (transparent) sits on top of the backdrop */}
       <div ref={mountRef} className="absolute inset-0 overflow-visible" />
