@@ -10,6 +10,7 @@ import {
   STROKE_WIDTH,
   ANIMATION_FADE_MS,
   ANIMATION_HOLD_MS,
+  RESTART_ANIMATION_AFTER_MS,
   DELAY,
   CAMERA_VIEWPOINT,
   CAMERA_TARGET,
@@ -80,19 +81,19 @@ export default function CanvasPage() {
         : Math.max(loopFrom, Math.min(ANIMATION_LOOP_TO, circles.length - 1));
     const activeCount = loopTo - loopFrom + 1;
 
-    // Total cycle length so the loop restarts cleanly once every active circle has played.
-    const cycleLen =
-      activeCount > 0 ? (activeCount - 1) * DELAY + perCircleMs : 0;
-
     /**
      * Redraw the plate for a given elapsed time (ms).
-     * Each circle fades in (ANIMATION_FADE_MS), holds at full opacity
+     * Each active circle fades in (ANIMATION_FADE_MS), holds at full opacity
      * (ANIMATION_HOLD_MS), then fades out (ANIMATION_FADE_MS), staggered by
      * DELAY in the configured order.
+     *
+     * Each circle restarts INDEPENDENTLY RESTART_ANIMATION_AFTER_MS after its
+     * own start time — so an early circle restarts even while a later circle is
+     * still mid-animation. A circle is hidden during the idle window between the
+     * end of its timeline (perCircleMs) and its next restart.
      */
     const drawCircles = (elapsed: number) => {
       tctx.clearRect(0, 0, texSize, texSize);
-      const t = cycleLen > 0 ? elapsed % cycleLen : 0;
 
       for (let i = 0; i < circles.length; i++) {
         const c = circles[i];
@@ -110,23 +111,26 @@ export default function CanvasPage() {
           const orderIndex = IS_FROM_OUTER_TO_INNER
             ? posInRange
             : activeCount - 1 - posInRange;
-          const start = orderIndex * DELAY;
-          const local = t - start; // ms since this circle started
+          const baseStart = orderIndex * DELAY;
+          const delta = elapsed - baseStart; // ms since this circle first started
           alpha = 0;
-          if (local >= 0 && local <= perCircleMs) {
+          if (delta >= 0) {
+            // Each circle restarts independently every RESTART_ANIMATION_AFTER_MS.
+            const local = delta % RESTART_ANIMATION_AFTER_MS;
             if (local < ANIMATION_FADE_MS) {
               // Phase 1: fade in (0 -> 1)
               alpha = local / ANIMATION_FADE_MS;
             } else if (local < ANIMATION_FADE_MS + ANIMATION_HOLD_MS) {
               // Phase 2: hold at full opacity (1)
               alpha = 1;
-            } else {
+            } else if (local < perCircleMs) {
               // Phase 3: fade out (1 -> 0)
               alpha =
                 1 -
                 (local - ANIMATION_FADE_MS - ANIMATION_HOLD_MS) /
                   ANIMATION_FADE_MS;
             }
+            // else: idle window (perCircleMs..RESTART) -> alpha stays 0 until restart
           }
         }
         if (alpha <= 0) continue;
@@ -259,7 +263,7 @@ export default function CanvasPage() {
           "left-[2px] top-[163px]",
           "bg-black",
         )}
-        // style={{ backgroundImage: "url('/canvas.jpg')" }}
+        style={{ backgroundImage: "url('/canvas.jpg')" }}
       />
       {/* WebGL canvas (transparent) sits on top of the backdrop */}
       <div ref={mountRef} className="absolute inset-0 overflow-visible" />
